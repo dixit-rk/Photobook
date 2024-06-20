@@ -1,0 +1,43 @@
+service: dixit-dev-photobook
+frameworkVersion: '3'
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  environment:
+    MY_AWS_ACCESS_KEY_ID: ${env:MY_AWS_ACCESS_KEY_ID}
+    MY_AWS_SECRET_ACCESS_KEY: ${env:MY_AWS_SECRET_ACCESS_KEY}
+    BUCKET_NAME: ${env:BUCKET_NAME}
+  iam:
+   role:
+    name: serverless-xyz
+    statements:
+     - Effect: Allow
+       Resource: "*"
+       Action:
+        - s3:GetObject
+        - s3:DeleteObject
+        - s3:PutObject
+        - s3:ListBucket
+
+functions:
+  api:
+    handler: index.handler
+    events:
+      - httpApi: '*'
+
+custom:
+  dotenv:
+   exclude:
+     -AWS_ACCESS_KEY_ID
+     -AWS_SECRET_ACCESS_KEY
+     -BUCKET_NAME
+
+package:
+  patterns:
+    - 'src/**'
+
+plugins:
+  - serverless-offline
+  - serverless-dotenv-plugin
